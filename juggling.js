@@ -15,6 +15,9 @@ var balls = [
     }
 ];
 var GRAVITY = 0.05;
+var HAND_RADIUS = 80;
+var BALL_RADIUS = 20;
+var GAME_OVER = false;
 
 function mouseCoords(event) {
     return {x: event.clientX - canvasBounds.left,
@@ -46,7 +49,7 @@ function redisplay() {
 
 function drawHand(){
     ctx.beginPath();
-    ctx.arc(handAt.x, handAt.y, 100, 0, 2*Math.PI, false);
+    ctx.arc(handAt.x, handAt.y, HAND_RADIUS, 0, 2*Math.PI, false);
     ctx.stroke();
 }
 
@@ -54,7 +57,7 @@ function drawBall(ball) {
     ctx.save();
     ctx.strokeStyle = 'red';
     ctx.beginPath();
-    ctx.arc(ball.position.x, ball.position.y, 20, 0, 2*Math.PI, false);
+    ctx.arc(ball.position.x, ball.position.y, BALL_RADIUS, 0, 2*Math.PI, false);
     ctx.stroke();
     ctx.restore();
 }
@@ -66,6 +69,9 @@ function scheduleNextFrame() {
 function onFrame() {
     updateState();
     redisplay();
+    if (balls[0].position.y > height){
+        return;
+    }
     scheduleNextFrame();
 }
 
@@ -73,3 +79,6 @@ function onLoad() {
     redisplay();
     scheduleNextFrame();
 }
+
+
+// collision occurs when d <= r1 + r2
