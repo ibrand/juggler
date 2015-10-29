@@ -130,9 +130,9 @@ function scheduleNextFrame() {
 function onFrame() {
     updateState();
     redisplay();
-    // if (balls[0].position.y > height){
-    //     return;
-    // }
+    if (balls[0].position.y > height){
+        return;
+    }
     scheduleNextFrame();
 }
 
@@ -140,6 +140,3 @@ function onLoad() {
     redisplay();
     scheduleNextFrame();
 }
-
-
-// collision occurs when d <= r1 + r2
