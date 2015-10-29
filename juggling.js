@@ -131,9 +131,9 @@ function gameOver() {
 }
 
 function updateState() {
-    hand.velocity.y *= 0.85;
+    hand.velocity = multiply(0.85, hand.velocity);
     balls.forEach(function (ball){
-        ball.position.y += ball.velocity.y;
+        ball.position = add(ball.position, ball.velocity);
         ball.velocity.y += GRAVITY;
 
         if (collidesWithHand(ball)) {
@@ -147,16 +147,19 @@ function updateState() {
 
 function spring(ball) {
     // start point should be right above the hand
-    var base = hand.position.y - HAND_RADIUS - 5;
+    var base = {x: hand.position.x, 
+                y: hand.position.y - HAND_RADIUS - 5};
+    var ballTop = subtract(ball.position, {x: 0, y: BALL_RADIUS});
+
     // computeDistance of the base and the ball
-    var separation = ball.position.y - BALL_RADIUS - base;
+    var separation = subtract(ball.position, base);
     var stiffness = 0.05;
 
-    var acceleration = -separation * stiffness;
+    var acceleration = multiply(-stiffness, separation);
 
     var dampening = 0.95;
-    ball.velocity.y *= dampening;
-    ball.velocity.y += acceleration;
+    ball.velocity = multiply(dampening, ball.velocity);
+    ball.velocity = add(ball.velocity, acceleration);
 
 }
 
@@ -165,10 +168,23 @@ function collidesWithHand(ball) {
     return d <= HAND_RADIUS + BALL_RADIUS;
 }
 
-// Helpers
+// Vectors
 
 function computeDistance(p1, p2){
     var xd = p1.x - p2.x;
     var yd = p1.y - p2.y;
     return Math.sqrt((xd*xd)+ (yd*yd));
 }
+
+function add(v1, v2){
+    return {x: v1.x + v2.x, y:v1.y+v2.y};
+}
+
+function subtract(v1, v2){
+    return {x: v1.x - v2.x, y:v1.y - v2.y};
+}
+
+function multiply(multiplier, v1){
+    return {x: multiplier * v1.x, y: multiplier * v1.y};
+}
+
