@@ -6,6 +6,7 @@
 var GRAVITY = 0.2;
 var HAND_RADIUS = 80;
 var BALL_RADIUS = 20;
+var STIFFNESS = 0.02;
 
 function onLoad() {
     canvas.addEventListener('mousemove', onMousemove);
@@ -142,6 +143,9 @@ function updateState() {
                 spring(ball);
             }
         }
+        if (collidesWithWall(ball)){
+            ball.velocity.x *= -1;
+        }
     });
 }
 
@@ -153,9 +157,8 @@ function spring(ball) {
 
     // computeDistance of the base and the ball
     var separation = subtract(ball.position, base);
-    var stiffness = 0.05;
 
-    var acceleration = multiply(-stiffness, separation);
+    var acceleration = multiply(-STIFFNESS, separation);
 
     var dampening = 0.95;
     ball.velocity = multiply(dampening, ball.velocity);
@@ -168,14 +171,20 @@ function collidesWithHand(ball) {
     return d <= HAND_RADIUS + BALL_RADIUS;
 }
 
+function collidesWithWall(ball) {
+    return ball.position.x < 0 || ball.position.x > width;
+}
+
 // Vectors
 
 function computeDistance(p1, p2){
-    var xd = p1.x - p2.x;
-    var yd = p1.y - p2.y;
-    return Math.sqrt((xd*xd)+ (yd*yd));
+    var d = subtract(p1,p2);
+    return Math.sqrt(dot(d, d));
 }
 
+function dot(v1, v2){
+    return v1.x * v2.x + v1.y * v2.y;
+}
 function add(v1, v2){
     return {x: v1.x + v2.x, y:v1.y+v2.y};
 }
