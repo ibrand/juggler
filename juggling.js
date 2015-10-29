@@ -48,7 +48,7 @@ function onFrame() {
 
 function redisplay() {
     ctx.clearRect(0, 0, width, height);
-    drawBall(balls[0]);
+    balls.forEach(drawBall);
     drawHand();
 }
 
@@ -94,19 +94,6 @@ function onMousemove(event) {
     previousTime = frameNumber;
 }
 
-function updateState() {
-    hand.velocity.y *= 0.85;
-    balls.forEach(function (ball){
-        ball.position.y += ball.velocity.y;
-        ball.velocity.y += GRAVITY;
-
-        if (collidesWithHand(ball)) {
-            spring(ball);
-        }
-    });
-}
-
-
 // The balls
 
 var balls = [
@@ -117,11 +104,45 @@ var balls = [
         velocity:{
             x:0, y:0
         }
+    },
+    {
+        position: {
+            x:width/2, y:height
+        },
+        velocity:{
+            x:0, y:-20
+        }
     }
 ];
 
+function drawBall(ball) {
+    ctx.save();
+    ctx.strokeStyle = 'red';
+    ctx.beginPath();
+    ctx.arc(ball.position.x, ball.position.y, BALL_RADIUS, 0, 2*Math.PI, false);
+    ctx.stroke();
+    ctx.restore();
+}
+
 function gameOver() {
-    return balls[0].position.y > height;
+    return balls.reduce(function (over, ball){
+        return over || ball.position.y > height;
+    }, false);
+}
+
+function updateState() {
+    hand.velocity.y *= 0.85;
+    balls.forEach(function (ball){
+        ball.position.y += ball.velocity.y;
+        ball.velocity.y += GRAVITY;
+
+        if (collidesWithHand(ball)) {
+            var vRelativeToBallY = hand.velocity.y - ball.velocity.y;
+            if (vRelativeToBallY < 0) {
+                spring(ball);
+            }
+        }
+    });
 }
 
 function spring(ball) {
@@ -141,19 +162,8 @@ function spring(ball) {
 
 function collidesWithHand(ball) {
     var d = computeDistance(ball.position, hand.position);
-    console.log("d", d);
     return d <= HAND_RADIUS + BALL_RADIUS;
 }
-
-function drawBall(ball) {
-    ctx.save();
-    ctx.strokeStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(ball.position.x, ball.position.y, BALL_RADIUS, 0, 2*Math.PI, false);
-    ctx.stroke();
-    ctx.restore();
-}
-
 
 // Helpers
 
