@@ -1,19 +1,60 @@
+// A juggling game.
+// Currently, just toss and catch one ball.
+// Assumes a webpage with a canvas element IDed 'canvas', and mouse
+// interaction. We'll want to do multitouch too.
+
+var GRAVITY = 0.2;
+var HAND_RADIUS = 80;
+var BALL_RADIUS = 20;
+
+function onLoad() {
+    canvas.addEventListener('mousemove', onMousemove);
+    redisplay();
+    scheduleNextFrame();
+}
+
+
+// The canvas
+
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
 var canvasBounds = canvas.getBoundingClientRect();
 var width        = canvas.width;
 var height       = canvas.height;
-var balls = [
-    {
-        position: {
-            x:width/2, y:0
-        },
-        velocity:{
-            x:0, y:0
-        }
+
+function mouseCoords(event) {
+    return {x: event.clientX - canvasBounds.left,
+            y: event.clientY - canvasBounds.top};
+}
+
+
+// The main loop
+
+function scheduleNextFrame() {
+    window.requestAnimationFrame(onFrame);
+}
+
+var frameNumber = 0;
+
+function onFrame() {
+    frameNumber++;
+    updateState();
+    redisplay();
+    if (!gameOver()) {
+        scheduleNextFrame();
     }
-];
+}
+
+function redisplay() {
+    ctx.clearRect(0, 0, width, height);
+    drawBall(balls[0]);
+    drawHand();
+}
+
+
+// The hand
+
 var hand =
 {
     position: {
@@ -24,21 +65,18 @@ var hand =
     }
 };
 
-var GRAVITY = 0.2;
-var HAND_RADIUS = 80;
-var BALL_RADIUS = 20;
-var GAME_OVER = false;
-
 var previousPosition = hand.position;
 var previousTime = 0;
 
-var frameNumber = 0;
-
-function mouseCoords(event) {
-    return {x: event.clientX - canvasBounds.left,
-            y: event.clientY - canvasBounds.top};
+function drawHand(){
+    ctx.beginPath();
+    ctx.arc(hand.position.x, hand.position.y, HAND_RADIUS, 0, 2*Math.PI, false);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(hand.position.x, hand.position.y);
+    ctx.lineTo(hand.position.x, hand.position.y + hand.velocity.y * 5);    
+    ctx.stroke();
 }
-
 
 function onMousemove(event) {
     hand.position = mouseCoords(event);
@@ -56,10 +94,7 @@ function onMousemove(event) {
     previousTime = frameNumber;
 }
 
-canvas.addEventListener('mousemove', onMousemove);
-
 function updateState() {
-    frameNumber++;
     hand.velocity.y *= 0.85;
     balls.forEach(function (ball){
         ball.position.y += ball.velocity.y;
@@ -69,6 +104,24 @@ function updateState() {
             spring(ball);
         }
     });
+}
+
+
+// The balls
+
+var balls = [
+    {
+        position: {
+            x:width/2, y:0
+        },
+        velocity:{
+            x:0, y:0
+        }
+    }
+];
+
+function gameOver() {
+    return balls[0].position.y > height;
 }
 
 function spring(ball) {
@@ -92,28 +145,6 @@ function collidesWithHand(ball) {
     return d <= HAND_RADIUS + BALL_RADIUS;
 }
 
-function computeDistance(p1, p2){
-    var xd = p1.x - p2.x;
-    var yd = p1.y - p2.y;
-    return Math.sqrt((xd*xd)+ (yd*yd));
-}
-
-function redisplay() {
-    ctx.clearRect(0, 0, width, height);
-    drawBall(balls[0]);
-    drawHand();
-}
-
-function drawHand(){
-    ctx.beginPath();
-    ctx.arc(hand.position.x, hand.position.y, HAND_RADIUS, 0, 2*Math.PI, false);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(hand.position.x, hand.position.y);
-    ctx.lineTo(hand.position.x, hand.position.y + hand.velocity.y * 5);    
-    ctx.stroke();
-}
-
 function drawBall(ball) {
     ctx.save();
     ctx.strokeStyle = 'red';
@@ -123,23 +154,11 @@ function drawBall(ball) {
     ctx.restore();
 }
 
-function scheduleNextFrame() {
-    window.requestAnimationFrame(onFrame);
+
+// Helpers
+
+function computeDistance(p1, p2){
+    var xd = p1.x - p2.x;
+    var yd = p1.y - p2.y;
+    return Math.sqrt((xd*xd)+ (yd*yd));
 }
-
-function onFrame() {
-    updateState();
-    redisplay();
-    // if (balls[0].position.y > height){
-    //     return;
-    // }
-    scheduleNextFrame();
-}
-
-function onLoad() {
-    redisplay();
-    scheduleNextFrame();
-}
-
-
-// collision occurs when d <= r1 + r2
