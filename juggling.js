@@ -3,7 +3,7 @@
 // Assumes a webpage with a canvas element IDed 'canvas', and mouse
 // interaction. We'll want to do multitouch too.
 
-var GRAVITY = 0.2;
+var GRAVITY = 0.07;
 var HAND_RADIUS = 80;
 var BALL_RADIUS = 20;
 var STIFFNESS = 0.02;
@@ -23,8 +23,11 @@ function onLoad() {
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-var width        = canvas.width;
-var height       = canvas.height;
+var width        = window.innerWidth;
+var height       = window.innerHeight;
+
+canvas.width = width;
+canvas.height = height;
 
 function mouseCoords(event) {
     var canvasBounds = canvas.getBoundingClientRect();
@@ -102,6 +105,14 @@ function onMousemove(event) {
 function onTouchStart(event) {
     // so here we'll grab the array and assign/make hands
     event.preventDefault();
+    for (var i = 0; i < event.touches.length; i++){
+        var position = touchCoords(event.touches[i]);
+        if (hands[i] !== undefined){
+            onDrag(position, hands[i]);
+        } else {
+            makeHand(position);
+        }
+    }
 }
 
 function onTouchMove(event) {
