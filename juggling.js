@@ -59,7 +59,7 @@ function redisplay() {
 var hand =
 {
     position: {
-        x:50, y:50
+        x:50, y:0.9*height
     },
     velocity:{
         x:0, y:0
@@ -111,7 +111,7 @@ var balls = [
             x:width/2, y:height
         },
         velocity:{
-            x:0, y:-20
+            x:0.5, y:-15
         }
     }
 ];
@@ -147,6 +147,24 @@ function updateState() {
             ball.velocity.x *= -1;
         }
     });
+    for(var i = 0; i < balls.length; i++){
+        for(var j = i+1; j<balls.length; j++){
+            ballBounce(balls[i], balls[j]);
+        }
+    }
+}
+
+var BALL_STIFFNESS = 0.005;
+
+function ballBounce(ball1, ball2) {
+    var d = subtract(ball1.position, ball2.position);
+    var springPosition = Math.sqrt(dot(d, d)) - 2*BALL_RADIUS;
+    if (springPosition < 0) {
+        console.log("bounce", springPosition);
+        var acceleration = multiply(-BALL_STIFFNESS * springPosition, d);
+        ball1.velocity = add(ball1.velocity, acceleration);
+        ball2.velocity = subtract(ball2.velocity, acceleration);
+    }
 }
 
 function spring(ball) {
