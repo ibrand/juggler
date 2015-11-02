@@ -20,13 +20,19 @@ function onLoad() {
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-var canvasBounds = canvas.getBoundingClientRect();
 var width        = canvas.width;
 var height       = canvas.height;
 
 function mouseCoords(event) {
+    var canvasBounds = canvas.getBoundingClientRect();
     return {x: event.clientX - canvasBounds.left,
             y: event.clientY - canvasBounds.top};
+}
+
+function touchCoords(touch) {
+    var canvasBounds = canvas.getBoundingClientRect();
+    return {x: touch.pageX - canvasBounds.left,
+            y: touch.pageY - canvasBounds.top};
 }
 
 
@@ -50,26 +56,33 @@ function onFrame() {
 function redisplay() {
     ctx.clearRect(0, 0, width, height);
     balls.forEach(drawBall);
-    drawHand();
+    hands.forEach(drawHand);
 }
 
 
 // The hand
 
-var hand =
-{
-    position: {
-        x:50, y:0.9*height
-    },
-    velocity:{
-        x:0, y:0
-    }
-};
+var hands = [];
+makeHand({x:50, y:0.9*height});
+makeHand({x:-1000, y:-1000}); // the invisible hand of god
 
-var previousPosition = hand.position;
+var previousPosition = hands[0].position;
 var previousTime = 0;
 
-function drawHand(){
+function makeHand(position){
+    hands.push(
+    {
+        position: position,
+        velocity: {
+            x:0, y:0
+        },
+        previousPosition: position,
+        previousTime: frameNumber
+    }
+        );
+}
+
+function drawHand(hand){
     ctx.beginPath();
     ctx.arc(hand.position.x, hand.position.y, HAND_RADIUS, 0, 2*Math.PI, false);
     ctx.stroke();
@@ -80,19 +93,28 @@ function drawHand(){
 }
 
 function onMousemove(event) {
-    hand.position = mouseCoords(event);
+    onDrag(mouseCoords(event), hands[0]);
+}
+
+function onTouchMove(event) {
+    event.touches.forEach(onDrag); // WORRY ABOUT THIS ...later.
+}
+
+function onDrag(position, hand) {
+    hand.position = position;
     // d = v*t
     // where d = hand.position.y - previousPosition.y
     //       t = frameNumber - previousTime
     // so v = d/t
-    if (frameNumber !== previousTime) {
+    if (frameNumber !== hand.previousTime) {
         hand.velocity = {
                 x: 0,// not really
-                y: (hand.position.y - previousPosition.y) / (frameNumber - previousTime)
+                y: ((hand.position.y - hand.previousPosition.y)/
+                 (frameNumber - hand.previousTime))
         }; 
-    }  
-    previousPosition = hand.position;
-    previousTime = frameNumber;
+    }
+    hand.previousPosition = hand.position;
+    hand.previousTime = frameNumber;
 }
 
 // The balls
@@ -132,15 +154,19 @@ function gameOver() {
 }
 
 function updateState() {
-    hand.velocity = multiply(0.85, hand.velocity);
+    hands.forEach(function (hand){
+        hand.velocity = multiply(0.85, hand.velocity);
+    });
     balls.forEach(function (ball){
         ball.position = add(ball.position, ball.velocity);
         ball.velocity.y += GRAVITY;
 
-        if (collidesWithHand(ball)) {
+        var hand = findClosestHand(ball);
+
+        if (collidesWithHand(ball, hand)) {
             var vRelativeToBallY = hand.velocity.y - ball.velocity.y;
             if (vRelativeToBallY < 0) {
-                spring(ball);
+                spring(ball,hand);
             }
         }
         if (collidesWithWall(ball)){
@@ -167,7 +193,7 @@ function ballBounce(ball1, ball2) {
     }
 }
 
-function spring(ball) {
+function spring(ball, hand) {
     // start point should be right above the hand
     var base = {x: hand.position.x, 
                 y: hand.position.y - HAND_RADIUS - 5};
@@ -184,7 +210,20 @@ function spring(ball) {
 
 }
 
-function collidesWithHand(ball) {
+function findClosestHand(ball) {
+    var bestDistance = Infinity;
+    var bestHand;
+    hands.forEach(function (hand){
+        var distance = computeDistance(ball.position, hand.position);
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            bestHand = hand;
+        }
+    });
+    return bestHand;
+}
+
+function collidesWithHand(ball, hand) {
     var d = computeDistance(ball.position, hand.position);
     return d <= HAND_RADIUS + BALL_RADIUS;
 }
