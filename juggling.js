@@ -10,6 +10,9 @@ var STIFFNESS = 0.02;
 
 function onLoad() {
     canvas.addEventListener('mousemove', onMousemove);
+    canvas.addEventListener('touchstart', onTouchStart);
+    canvas.addEventListener('touchmove', onTouchMove);
+    canvas.addEventListener('touchend', onTouchEnd);
     redisplay();
     scheduleNextFrame();
 }
@@ -96,8 +99,19 @@ function onMousemove(event) {
     onDrag(mouseCoords(event), hands[0]);
 }
 
+function onTouchStart(event) {
+    // so here we'll grab the array and assign/make hands
+    event.preventDefault();
+}
+
 function onTouchMove(event) {
-    event.touches.forEach(onDrag); // WORRY ABOUT THIS ...later.
+    for (var i = 0; i < event.touches.length; i++){
+        onDrag(touchCoords(event.touches[i]), hands[i]);
+    }
+}
+
+function onTouchEnd(event) {
+    // do nothing
 }
 
 function onDrag(position, hand) {
@@ -186,7 +200,6 @@ function ballBounce(ball1, ball2) {
     var d = subtract(ball1.position, ball2.position);
     var springPosition = Math.sqrt(dot(d, d)) - 2*BALL_RADIUS;
     if (springPosition < 0) {
-        console.log("bounce", springPosition);
         var acceleration = multiply(-BALL_STIFFNESS * springPosition, d);
         ball1.velocity = add(ball1.velocity, acceleration);
         ball2.velocity = subtract(ball2.velocity, acceleration);
@@ -253,4 +266,3 @@ function subtract(v1, v2){
 function multiply(multiplier, v1){
     return {x: multiplier * v1.x, y: multiplier * v1.y};
 }
-
