@@ -122,7 +122,7 @@ function onTouchMove(event) {
 
 function onTouchEnd(event) {
     onTouchMove(event);
-    for (var i = hand.length - event.touches.length; 0 < i; --i) {
+    for (var i = hands.length - event.touches.length; 0 < i; --i) {
         hands.pop();
     }
 }
