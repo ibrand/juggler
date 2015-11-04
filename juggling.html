@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <head>
   <title>Juggler</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body onload="onLoad()">
   <canvas id="canvas"></canvas>
+  <div class="control-panel">
+      <input type="text" id="gravity-toggle"></input>
+  </div>
   <div id="debug"></div>
   <script src="requestAnimationFramePolyfill.js"></script>
   <script src="vector.js"></script>

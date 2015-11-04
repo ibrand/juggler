@@ -18,6 +18,7 @@ function onLoad() {
     redisplay();
     scheduleNextFrame();
     startTime = Date.now();
+    changeGravity();
 }
 
 
@@ -27,7 +28,7 @@ var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
 var width        = window.innerWidth;
-var height       = window.innerHeight;
+var height       = window.innerHeight - 100;
 
 canvas.width = width;
 canvas.height = height;
@@ -191,6 +192,7 @@ function drawBall(ball) {
 }
 
 function gameOver() {
+    return false;
     return balls.reduce(function (over, ball){
         return over || ball.position.y > height;
     }, false);
@@ -202,7 +204,8 @@ function updateState() {
     });
     balls.forEach(function (ball){
         ball.position = vector.add(ball.position, ball.velocity);
-        ball.velocity.y += GRAVITY;
+        if (ball.position.y < height) ball.velocity.y += GRAVITY;
+        else{ball.velocity.y = 0}
 
         var hand = findClosestHand(ball);
 
@@ -271,6 +274,18 @@ function collidesWithHand(ball, hand) {
 }
 
 function collidesWithWall(ball) {
-    return ball.position.x < 0 || ball.position.x > width;
+    return ball.position.x < 0 || ball.position.x > width; // to include y
+}
+
+// control panel
+
+function changeGravity() {
+    var gInput = document.getElementById('gravity-toggle');
+    gInput.value = GRAVITY;
+    console.log(gInput);
+    gInput.oninput = function() {
+        GRAVITY = parseFloat(gInput.value);
+        console.log('GRAVITY', GRAVITY)
+    }
 }
 
