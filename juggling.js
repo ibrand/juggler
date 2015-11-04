@@ -69,23 +69,18 @@ function redisplay() {
 // The hand
 
 var hands = [];
-makeHand({x:50, y:0.9*height});
-makeHand({x:-1000, y:-1000}); // the invisible hand of god
 
-var previousPosition = hands[0].position;
-var previousTime = 0;
+var invisibleHand = makeHand({x:-1000, y:-1000}); // the invisible hand of god
 
 function makeHand(position){
-    hands.push(
-    {
+    return {
         position: position,
         velocity: {
             x:0, y:0
         },
         previousPosition: position,
         previousTime: frameNumber
-    }
-        );
+    };
 }
 
 function drawHand(hand){
@@ -99,7 +94,11 @@ function drawHand(hand){
 }
 
 function onMousemove(event) {
-    onDrag(mouseCoords(event), hands[0]);
+    var at = mouseCoords(event);
+    if (0 === hands.length) {
+        hands.push(makeHand(at));
+    }
+    onDrag(at, hands[0]);
 }
 
 function onTouchStart(event) {
@@ -236,7 +235,7 @@ function spring(ball, hand) {
 
 function findClosestHand(ball) {
     var bestDistance = Infinity;
-    var bestHand;
+    var bestHand = invisibleHand;
     hands.forEach(function (hand){
         var distance = vector.computeDistance(ball.position, hand.position);
         if (distance < bestDistance) {
