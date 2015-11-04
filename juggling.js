@@ -53,12 +53,23 @@ function scheduleNextFrame() {
 
 var frameNumber = 0;
 
+var frameInterval = 1/30 * 1000;       // 30fps target
+
 function onFrame() {
     var now = Date.now();
-    frameNumber++;
-    if (frameNumber % 30 === 0) console.log("fps", frameNumber / ((now - startTime) / 1000));
-    updateState();
-    redisplay();
+    var didUpdate = false;
+    while (startTime + (frameNumber+1) * frameInterval <= now) {
+        frameNumber++;
+        if (frameNumber % 30 === 0) console.log("fps", frameNumber / ((now - startTime) / 1000));
+        updateState();
+        didUpdate = true;
+        if (gameOver()) {
+            break;
+        }
+    }
+    if (didUpdate) {
+        redisplay();
+     }
     if (!gameOver()) {
         scheduleNextFrame();
     }
