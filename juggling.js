@@ -109,7 +109,7 @@ function onTouchStart(event) {
         if (hands[i] !== undefined){
             onDrag(position, hands[i]);
         } else {
-            makeHand(position);
+            hands.push(makeHand(position));
         }
     }
 }
