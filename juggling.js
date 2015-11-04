@@ -8,6 +8,8 @@ var HAND_RADIUS = 80;
 var BALL_RADIUS = 20;
 var STIFFNESS = 0.02;
 
+var startTime;
+
 function onLoad() {
     canvas.addEventListener('mousemove', onMousemove);
     canvas.addEventListener('touchstart', onTouchStart);
@@ -15,6 +17,7 @@ function onLoad() {
     canvas.addEventListener('touchend', onTouchEnd);
     redisplay();
     scheduleNextFrame();
+    startTime = Date.now();
 }
 
 
@@ -51,7 +54,9 @@ function scheduleNextFrame() {
 var frameNumber = 0;
 
 function onFrame() {
+    var now = Date.now();
     frameNumber++;
+    if (frameNumber % 30 === 0) console.log("fps", frameNumber / ((now - startTime) / 1000));
     updateState();
     redisplay();
     if (!gameOver()) {
