@@ -3,10 +3,11 @@
 // Assumes a webpage with a canvas element IDed 'canvas', and mouse
 // interaction. We'll want to do multitouch too.
 
+var FORCE = 2;
 var GRAVITY = 0.07;
 var HAND_RADIUS = 80;
 var BALL_RADIUS = 20;
-var STIFFNESS = 0.02;
+var STIFFNESS = GRAVITY / FORCE;
 
 var startTime;
 
@@ -29,6 +30,8 @@ var ctx = canvas.getContext('2d');
 
 var width        = window.innerWidth;
 var height       = window.innerHeight - 100;
+
+var SPEED_LIMIT = Math.sqrt(2*height*GRAVITY); // speed limit is dependent on height
 
 canvas.width = width;
 canvas.height = height;
@@ -204,7 +207,8 @@ function updateState() {
     });
     balls.forEach(function (ball){
         ball.position = vector.add(ball.position, ball.velocity);
-        if (ball.position.y < height) ball.velocity.y += GRAVITY;
+
+        if (ball.position.y <= height-5) ball.velocity.y += GRAVITY;
         else{ball.velocity.y = 0}
 
         var hand = findClosestHand(ball);
@@ -239,6 +243,9 @@ function ballBounce(ball1, ball2) {
 }
 
 function spring(ball, hand) {
+    if (-ball.velocity.y >= SPEED_LIMIT) {
+        return;
+    }
     // start point should be right above the hand
     var base = {x: hand.position.x, 
                 y: hand.position.y - HAND_RADIUS - 5};
@@ -285,7 +292,8 @@ function changeGravity() {
     console.log(gInput);
     gInput.oninput = function() {
         GRAVITY = parseFloat(gInput.value);
-        console.log('GRAVITY', GRAVITY)
+        STIFFNESS = GRAVITY / FORCE;
+        SPEED_LIMIT = Math.sqrt(2*height*GRAVITY);
     }
 }
 
