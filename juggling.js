@@ -180,10 +180,10 @@ function gameOver() {
 
 function updateState() {
     hands.forEach(function (hand){
-        hand.velocity = multiply(0.85, hand.velocity);
+        hand.velocity = vector.multiply(0.85, hand.velocity);
     });
     balls.forEach(function (ball){
-        ball.position = add(ball.position, ball.velocity);
+        ball.position = vector.add(ball.position, ball.velocity);
         ball.velocity.y += GRAVITY;
 
         var hand = findClosestHand(ball);
@@ -208,12 +208,12 @@ function updateState() {
 var BALL_STIFFNESS = 0.005;
 
 function ballBounce(ball1, ball2) {
-    var d = subtract(ball1.position, ball2.position);
-    var springPosition = Math.sqrt(dot(d, d)) - 2*BALL_RADIUS;
+    var d = vector.subtract(ball1.position, ball2.position);
+    var springPosition = Math.sqrt(vector.dot(d, d)) - 2*BALL_RADIUS;
     if (springPosition < 0) {
-        var acceleration = multiply(-BALL_STIFFNESS * springPosition, d);
-        ball1.velocity = add(ball1.velocity, acceleration);
-        ball2.velocity = subtract(ball2.velocity, acceleration);
+        var acceleration = vector.multiply(-BALL_STIFFNESS * springPosition, d);
+        ball1.velocity = vector.add(ball1.velocity, acceleration);
+        ball2.velocity = vector.subtract(ball2.velocity, acceleration);
     }
 }
 
@@ -221,16 +221,16 @@ function spring(ball, hand) {
     // start point should be right above the hand
     var base = {x: hand.position.x, 
                 y: hand.position.y - HAND_RADIUS - 5};
-    var ballTop = subtract(ball.position, {x: 0, y: BALL_RADIUS});
+    var ballTop = vector.subtract(ball.position, {x: 0, y: BALL_RADIUS});
 
     // computeDistance of the base and the ball
-    var separation = subtract(ball.position, base);
+    var separation = vector.subtract(ball.position, base);
 
-    var acceleration = multiply(-STIFFNESS, separation);
+    var acceleration = vector.multiply(-STIFFNESS, separation);
 
     var dampening = 0.95;
-    ball.velocity = multiply(dampening, ball.velocity);
-    ball.velocity = add(ball.velocity, acceleration);
+    ball.velocity = vector.multiply(dampening, ball.velocity);
+    ball.velocity = vector.add(ball.velocity, acceleration);
 
 }
 
@@ -238,7 +238,7 @@ function findClosestHand(ball) {
     var bestDistance = Infinity;
     var bestHand;
     hands.forEach(function (hand){
-        var distance = computeDistance(ball.position, hand.position);
+        var distance = vector.computeDistance(ball.position, hand.position);
         if (distance < bestDistance) {
             bestDistance = distance;
             bestHand = hand;
@@ -248,7 +248,7 @@ function findClosestHand(ball) {
 }
 
 function collidesWithHand(ball, hand) {
-    var d = computeDistance(ball.position, hand.position);
+    var d = vector.computeDistance(ball.position, hand.position);
     return d <= HAND_RADIUS + BALL_RADIUS;
 }
 
@@ -256,24 +256,3 @@ function collidesWithWall(ball) {
     return ball.position.x < 0 || ball.position.x > width;
 }
 
-// Vectors
-
-function computeDistance(p1, p2){
-    var d = subtract(p1,p2);
-    return Math.sqrt(dot(d, d));
-}
-
-function dot(v1, v2){
-    return v1.x * v2.x + v1.y * v2.y;
-}
-function add(v1, v2){
-    return {x: v1.x + v2.x, y:v1.y+v2.y};
-}
-
-function subtract(v1, v2){
-    return {x: v1.x - v2.x, y:v1.y - v2.y};
-}
-
-function multiply(multiplier, v1){
-    return {x: multiplier * v1.x, y: multiplier * v1.y};
-}
