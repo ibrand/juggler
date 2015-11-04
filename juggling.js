@@ -121,7 +121,10 @@ function onTouchMove(event) {
 }
 
 function onTouchEnd(event) {
-    // do nothing
+    onTouchMove(event);
+    for (var i = hand.length - event.touches.length; 0 < i; --i) {
+        hands.pop();
+    }
 }
 
 function onDrag(position, hand) {
