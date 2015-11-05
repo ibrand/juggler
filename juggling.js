@@ -4,8 +4,8 @@
 
 'use strict';
 
-var FORCE = 2;
-var GRAVITY = 0.07;
+var FORCE = 1;
+var GRAVITY = 0.15;
 var HAND_RADIUS = 80;
 var BALL_RADIUS = 20;
 var STIFFNESS = GRAVITY / FORCE;
@@ -32,7 +32,7 @@ var ctx = canvas.getContext('2d');
 var width        = window.innerWidth;
 var height       = window.innerHeight - 100;
 
-var SPEED_LIMIT = Math.sqrt(2*height*GRAVITY); // speed limit is dependent on height
+var SPEED_LIMIT = Math.sqrt(1*height*GRAVITY); // speed limit is dependent on height
 
 canvas.width = width;
 canvas.height = height;
@@ -249,7 +249,7 @@ function spring(ball, hand) {
     }
     // start point should be right above the hand
     var base = {x: hand.position.x, 
-                y: hand.position.y - HAND_RADIUS - 5};
+                y: hand.position.y};
     var ballTop = vector.subtract(ball.position, {x: 0, y: BALL_RADIUS});
 
     // computeDistance of the base and the ball
@@ -257,7 +257,7 @@ function spring(ball, hand) {
 
     var acceleration = vector.multiply(-STIFFNESS, separation);
 
-    var dampening = 0.95;
+    var dampening = 0.75;
     ball.velocity = vector.multiply(dampening, ball.velocity);
     ball.velocity = vector.add(ball.velocity, acceleration);
 
