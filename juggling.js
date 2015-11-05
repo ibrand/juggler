@@ -206,6 +206,7 @@ function addBall() {
 }
 
 document.getElementById('add-ball').addEventListener('click', addBall);
+document.getElementById('toggle-draw-physics').addEventListener('click', function() { showPhysics = !showPhysics; });
 
 function drawBall(ball) {
     ctx.save();
