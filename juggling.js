@@ -184,6 +184,17 @@ var balls = [
     }
 ];
 
+function makeRandomBall() {
+    return {position: {x: Math.random() * width, 
+                       y: Math.random() * height},
+            velocity: {x: Math.random() * 10 - 5, 
+                       y: Math.random() * -10 + 5}};
+}
+
+function addBall() {
+    balls.push(makeRandomBall());
+}
+
 function drawBall(ball) {
     ctx.save();
     ctx.strokeStyle = 'red';
