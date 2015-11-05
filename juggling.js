@@ -4,8 +4,8 @@
 
 'use strict';
 
-var FORCE = 1;
-var GRAVITY = 0.15;
+var FORCE = 5;
+var GRAVITY = 0.3;
 var HAND_RADIUS = 80;
 var BALL_RADIUS = 20;
 var STIFFNESS = GRAVITY / FORCE;
@@ -252,7 +252,7 @@ function spring(ball, hand) {
 
     var acceleration = vector.multiply(-STIFFNESS, separation);
 
-    var damping = 0.3;
+    var damping = 0.5;
     acceleration = vector.subtract(acceleration,
                                    vector.multiply(damping, vector.subtract(ball.velocity,
                                                                             hand.velocity)));
