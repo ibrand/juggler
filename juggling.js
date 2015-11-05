@@ -87,7 +87,9 @@ function redisplay() {
 }
 
 
-// The hand
+// The hands
+// They head toward the (mouse or touch) pointers, but can only
+// go so fast.
 
 var hands = [];
 
@@ -95,22 +97,17 @@ var invisibleHand = makeHand({x:-1000, y:-1000}); // the invisible hand of god
 
 function makeHand(position){
     return {
+        target: position,
         position: position,
         velocity: {
             x:0, y:0
         },
-        previousPosition: position,
-        previousTime: frameNumber
     };
 }
 
 function drawHand(hand){
     ctx.beginPath();
     ctx.arc(hand.position.x, hand.position.y, HAND_RADIUS, 0, 2*Math.PI, false);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(hand.position.x, hand.position.y);
-    ctx.lineTo(hand.position.x, hand.position.y + hand.velocity.y * 5);    
     ctx.stroke();
 }
 
@@ -148,21 +145,20 @@ function onTouchEnd(event) {
     }
 }
 
-function onDrag(position, hand) {
-    hand.position = position;
-    // d = v*t
-    // where d = hand.position.y - previousPosition.y
-    //       t = frameNumber - previousTime
-    // so v = d/t
-    if (frameNumber !== hand.previousTime) {
-        hand.velocity = {
-                x: 0,// not really
-                y: ((hand.position.y - hand.previousPosition.y) /
-                    (frameNumber - hand.previousTime))
-        }; 
+var maxHandSpeed = 20;           // XXX tweak
+
+function moveHand(hand) {
+    var v = vector.subtract(hand.target, hand.position);
+    var magnitude = vector.computeDistance(v, {x: 0, y: 0});
+    if (maxHandSpeed < magnitude) {
+        v = vector.multiply(maxHandSpeed/magnitude, v);
     }
-    hand.previousPosition = hand.position;
-    hand.previousTime = frameNumber;
+    hand.velocity = v;
+    hand.position = vector.add(hand.position, v);
+}
+
+function onDrag(position, hand) {
+    hand.target = position;
 }
 
 // The balls
@@ -203,9 +199,7 @@ function gameOver() {
 }
 
 function updateState() {
-    hands.forEach(function (hand){
-        hand.velocity = vector.multiply(0.85, hand.velocity);
-    });
+    hands.forEach(moveHand);
     balls.forEach(function (ball){
         ball.position = vector.add(ball.position, ball.velocity);
 
@@ -258,7 +252,7 @@ function spring(ball, hand) {
 
     var acceleration = vector.multiply(-STIFFNESS, separation);
 
-    var damping = 0.2;
+    var damping = 0.3;
     acceleration = vector.subtract(acceleration,
                                    vector.multiply(damping, vector.subtract(ball.velocity,
                                                                             hand.velocity)));
