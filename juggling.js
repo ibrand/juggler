@@ -157,8 +157,8 @@ function onDrag(position, hand) {
     if (frameNumber !== hand.previousTime) {
         hand.velocity = {
                 x: 0,// not really
-                y: ((hand.position.y - hand.previousPosition.y)/
-                 (frameNumber - hand.previousTime))
+                y: ((hand.position.y - hand.previousPosition.y) /
+                    (frameNumber - hand.previousTime))
         }; 
     }
     hand.previousPosition = hand.position;
