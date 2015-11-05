@@ -210,7 +210,7 @@ function updateState() {
         ball.position = vector.add(ball.position, ball.velocity);
 
         if (ball.position.y <= height-5) ball.velocity.y += GRAVITY;
-        else{ball.velocity.y = 0}
+        else{ball.velocity.y = -2}
 
         var hand = findClosestHand(ball);
 
@@ -247,6 +247,7 @@ function spring(ball, hand) {
     if (-ball.velocity.y >= SPEED_LIMIT) {
         return;
     }
+
     // start point should be right above the hand
     var base = {x: hand.position.x, 
                 y: hand.position.y};
@@ -257,8 +258,10 @@ function spring(ball, hand) {
 
     var acceleration = vector.multiply(-STIFFNESS, separation);
 
-    var dampening = 0.75;
-    ball.velocity = vector.multiply(dampening, ball.velocity);
+    var damping = 0.2;
+    acceleration = vector.subtract(acceleration,
+                                   vector.multiply(damping, vector.subtract(ball.velocity,
+                                                                            hand.velocity)));
     ball.velocity = vector.add(ball.velocity, acceleration);
 
 }
