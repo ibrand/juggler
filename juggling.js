@@ -304,10 +304,9 @@ function collidesWithCeiling(ball) {
 
 function changeGravity() {
     var gInput = document.getElementById('gravity-toggle');
-    gInput.value = GRAVITY;
-    console.log(gInput);
-    gInput.oninput = function() {
-        GRAVITY = parseFloat(gInput.value);
+    gInput.value = GRAVITY*100;
+    gInput.onchange = function() {
+        GRAVITY = parseFloat(gInput.value/100);
         STIFFNESS = GRAVITY / FORCE;
         SPEED_LIMIT = Math.sqrt(2*height*GRAVITY);
     }
