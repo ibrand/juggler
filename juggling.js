@@ -195,6 +195,8 @@ function addBall() {
     balls.push(makeRandomBall());
 }
 
+document.getElementById('add-ball').addEventListener('click', addBall);
+
 function drawBall(ball) {
     ctx.save();
     ctx.strokeStyle = 'red';
@@ -304,7 +306,10 @@ function collidesWithHand(ball, hand) {
 }
 
 function collidesWithWall(ball) {
-    return ball.position.x < BALL_RADIUS || ball.position.x > width - BALL_RADIUS;
+    if (ball.velocity.x <= 0)
+        return ball.position.x < BALL_RADIUS;
+    else
+        return ball.position.x > width - BALL_RADIUS;
 }
 
 function collidesWithCeiling(ball) {
