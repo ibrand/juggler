@@ -1,7 +1,8 @@
 // A juggling game.
-// Currently, just toss and catch one ball.
-// Assumes a webpage with a canvas element IDed 'canvas', and mouse
-// interaction. We'll want to do multitouch too.
+// Assumes a webpage with a canvas element IDed 'canvas', and either mouse
+// or touch interaction.
+
+'use strict';
 
 var FORCE = 2;
 var GRAVITY = 0.07;
