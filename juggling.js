@@ -229,7 +229,7 @@ function updateState() {
                     break;
             }
         }
-        if (ball.position.y <= height-5) ball.velocity.y += GRAVITY;
+        if (ball.position.y <= height-BALL_RADIUS) ball.velocity.y += GRAVITY;
         else{ball.velocity.y = -2}
     });
     for(var i = 0; i < balls.length; i++){
@@ -293,11 +293,11 @@ function collidesWithHand(ball, hand) {
 }
 
 function collidesWithWall(ball) {
-    return ball.position.x < 0 || ball.position.x > width; // to include y
+    return ball.position.x < BALL_RADIUS || ball.position.x > width - BALL_RADIUS;
 }
 
 function collidesWithCeiling(ball) {
-    return ball.position.y <= 0;
+    return ball.position.y <= BALL_RADIUS;
 }
 
 // control panel
