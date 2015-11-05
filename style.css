@@ -12,20 +12,17 @@
 
 .control-panel {
     position: absolute;
-    width: 100%;
-    height: 50px;
+    width: 25%;
+    height: 100%;
     bottom: 0px;
 }
 
-.toggle-elastic-bounce {
-
+.buttons {
+    position: absolute;
+    top: 10px;
 }
 
-.toggle-ceiling {
-
-}
-
-.gravity-toggle {
-    width: 30px;
-    height: 30px;
+#gravity-toggle {
+    top: 80px;
+    position: absolute;
 }
