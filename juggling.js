@@ -12,6 +12,8 @@ var STIFFNESS = GRAVITY / FORCE;
 
 var ceilingState = 'off';
 
+var showPhysics = false;
+
 var startTime;
 
 function onLoad() {
@@ -172,6 +174,9 @@ var balls = [
         },
         velocity:{
             x:0, y:0
+        },
+        prevVelocity: {
+            x:0, y:0
         }
     },
     {
@@ -180,6 +185,9 @@ var balls = [
         },
         velocity:{
             x:0.5, y:-15
+        },
+        prevVelocity: {
+            x:0, y:0
         }
     }
 ];
@@ -188,7 +196,9 @@ function makeRandomBall() {
     return {position: {x: Math.random() * width, 
                        y: Math.random() * height},
             velocity: {x: Math.random() * 10 - 5, 
-                       y: Math.random() * -10 + 5}};
+                       y: Math.random() * -10 + 5},
+            prevVelocity: {x: 0, y: 0}
+           };
 }
 
 function addBall() {
@@ -199,10 +209,27 @@ document.getElementById('add-ball').addEventListener('click', addBall);
 
 function drawBall(ball) {
     ctx.save();
-    ctx.strokeStyle = 'red';
+    ctx.strokeStyle = 'green';
     ctx.beginPath();
     ctx.arc(ball.position.x, ball.position.y, BALL_RADIUS, 0, 2*Math.PI, false);
     ctx.stroke();
+    if (showPhysics) {
+        ctx.strokeStyle = 'blue';
+        if (1) {
+            ctx.beginPath();
+            ctx.moveTo(ball.position.x, ball.position.y);
+            ctx.lineTo(ball.position.x + ball.velocity.x*2,
+                       ball.position.y + ball.velocity.y*2);
+            ctx.stroke();
+        }
+        var acceleration = vector.subtract(ball.velocity, ball.prevVelocity);
+        ctx.strokeStyle = 'red';
+        ctx.beginPath();
+        ctx.moveTo(ball.position.x, ball.position.y);
+        ctx.lineTo(ball.position.x + acceleration.x*20,
+                   ball.position.y + acceleration.y*20);
+        ctx.stroke();
+    }
     ctx.restore();
 }
 
@@ -217,6 +244,7 @@ function updateState() {
     hands.forEach(moveHand);
     balls.forEach(function (ball){
         ball.position = vector.add(ball.position, ball.velocity);
+        ball.prevVelocity = ball.velocity;
 
         var hand = findClosestHand(ball);
 
