@@ -65,7 +65,7 @@ function onFrame() {
     var didUpdate = false;
     while (startTime + (frameNumber+1) * frameInterval <= now) {
         frameNumber++;
-        if (frameNumber % 30 === 0) console.log("fps", frameNumber / ((now - startTime) / 1000));
+//        if (frameNumber % 30 === 0) console.log("fps", frameNumber / ((now - startTime) / 1000));
         updateState();
         didUpdate = true;
         if (gameOver()) {
@@ -74,7 +74,7 @@ function onFrame() {
     }
     if (didUpdate) {
         redisplay();
-     }
+    }
     if (!gameOver()) {
         scheduleNextFrame();
     }
