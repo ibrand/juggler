@@ -4,9 +4,16 @@
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body onload="onLoad()">
-  <canvas id="canvas"></canvas>
-  <div class="control-panel">
+  <div class="container">
+    <canvas id="canvas"></canvas>
+    <div class="control-panel">
+      <form name="buttons" action="">
+        <input type="radio" name="toggle" value="ceiling toggle">no ceiling<br>
+        <input type="radio" name="toggle" value="ceiling toggle">elastic ceiling<br>
+        <input type="radio" name="toggle" value="elastic bounce toggle">dead ceiling
+      </form>
       <input type="text" id="gravity-toggle"></input>
+    </div>
   </div>
   <div id="debug"></div>
   <script src="requestAnimationFramePolyfill.js"></script>

@@ -10,6 +10,8 @@ var HAND_RADIUS = 80;
 var BALL_RADIUS = 20;
 var STIFFNESS = GRAVITY / FORCE;
 
+var ceilingState = 'off';
+
 var startTime;
 
 function onLoad() {
@@ -29,8 +31,8 @@ function onLoad() {
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-var width        = window.innerWidth;
-var height       = window.innerHeight - 100;
+var width        = window.innerWidth/2;
+var height       = window.innerHeight;
 
 var SPEED_LIMIT = Math.sqrt(1*height*GRAVITY); // speed limit is dependent on height
 
@@ -203,9 +205,6 @@ function updateState() {
     balls.forEach(function (ball){
         ball.position = vector.add(ball.position, ball.velocity);
 
-        if (ball.position.y <= height-5) ball.velocity.y += GRAVITY;
-        else{ball.velocity.y = -2}
-
         var hand = findClosestHand(ball);
 
         if (collidesWithHand(ball, hand)) {
@@ -217,6 +216,21 @@ function updateState() {
         if (collidesWithWall(ball)){
             ball.velocity.x *= -1;
         }
+        if (collidesWithCeiling(ball)){
+            switch (ceilingState) {
+                case 'off':
+                    // do nothing
+                    break;
+                case 'elastic':
+                    ball.velocity.y *= -1;
+                    break;
+                case 'dead':
+                    ball.velocity.y = 0;
+                    break;
+            }
+        }
+        if (ball.position.y <= height-5) ball.velocity.y += GRAVITY;
+        else{ball.velocity.y = -2}
     });
     for(var i = 0; i < balls.length; i++){
         for(var j = i+1; j<balls.length; j++){
@@ -282,6 +296,10 @@ function collidesWithWall(ball) {
     return ball.position.x < 0 || ball.position.x > width; // to include y
 }
 
+function collidesWithCeiling(ball) {
+    return ball.position.y <= 0;
+}
+
 // control panel
 
 function changeGravity() {
@@ -294,4 +312,26 @@ function changeGravity() {
         SPEED_LIMIT = Math.sqrt(2*height*GRAVITY);
     }
 }
+
+var radioButtons = document.buttons.toggle;
+
+var radioHandlers = [
+    function() { // turn off ceiling
+        ceilingState = 'off';
+    },
+    function() { // elastic ceiling
+        ceilingState = 'elastic';
+    },
+    function() { // dead ceiling
+        ceilingState = 'dead';
+    }
+];
+
+for(var i = 0; i < radioButtons.length; i++){
+    radioButtons[i].onclick = radioHandlers[i];
+}
+
+
+
+
 
