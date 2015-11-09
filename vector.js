@@ -1,5 +1,7 @@
 var vector = (function(){
 
+'use strict';
+
 function computeDistance(p1, p2){
     var d = subtract(p1,p2);
     return Math.sqrt(dot(d, d));
