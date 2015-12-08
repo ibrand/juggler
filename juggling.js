@@ -27,7 +27,7 @@ function onLoad() {
     canvas.addEventListener('touchend', onTouchEnd);
 
     gInput.value = GRAVITY*100;
-    gInput.onchange = changeGravity;
+    gInput.addEventListener('input', changeGravity);
     changeGravity();
 
     redisplay();
