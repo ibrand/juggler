@@ -34,7 +34,7 @@ var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
 var width        = window.innerWidth/2;
-var height       = window.innerHeight;
+var height       = window.innerHeight - 2;
 
 var SPEED_LIMIT = Math.sqrt(1*height*GRAVITY); // speed limit is dependent on height
 
