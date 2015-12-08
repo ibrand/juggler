@@ -301,7 +301,7 @@ function spring(ball, hand) {
     // start point should be right above the hand
     var base = {x: hand.position.x, 
                 y: hand.position.y};
-    var ballTop = vector.subtract(ball.position, {x: 0, y: BALL_RADIUS});
+    // var ballTop = vector.subtract(ball.position, {x: 0, y: BALL_RADIUS});
 
     // computeDistance of the base and the ball
     var separation = vector.subtract(ball.position, base);
@@ -351,10 +351,10 @@ function changeGravity() {
     var gInput = document.getElementById('gravity-toggle');
     gInput.value = GRAVITY*100;
     gInput.onchange = function() {
-        GRAVITY = parseFloat(gInput.value/100);
+        GRAVITY = parseFloat(gInput.value)/100;
         STIFFNESS = GRAVITY / FORCE;
         SPEED_LIMIT = Math.sqrt(2*height*GRAVITY);
-    }
+    };
 }
 
 var radioButtons = document.buttons.toggle;
