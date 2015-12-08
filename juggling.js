@@ -8,7 +8,9 @@ var FORCE = 5;
 var GRAVITY = 0.3;
 var HAND_RADIUS = 80;
 var BALL_RADIUS = 20;
-var STIFFNESS = GRAVITY / FORCE;
+
+var STIFFNESS;      // These are set according to GRAVITY.
+var SPEED_LIMIT;
 
 var ceilingState = 'off';
 
@@ -16,30 +18,34 @@ var showPhysics = false;
 
 var startTime;
 
+var gInput = document.getElementById('gravity-toggle');
+
 function onLoad() {
     canvas.addEventListener('mousemove', onMousemove);
     canvas.addEventListener('touchstart', onTouchStart);
     canvas.addEventListener('touchmove', onTouchMove);
     canvas.addEventListener('touchend', onTouchEnd);
+
+    gInput.value = GRAVITY*100;
+    gInput.onchange = changeGravity;
+    changeGravity();
+
     redisplay();
     scheduleNextFrame();
     startTime = Date.now();
-    changeGravity();
 }
 
 
 // The canvas
 
+var width  = window.innerWidth/2;
+var height = window.innerHeight - 2;
+
 var canvas = document.getElementById('canvas');
-var ctx = canvas.getContext('2d');
-
-var width        = window.innerWidth/2;
-var height       = window.innerHeight - 2;
-
-var SPEED_LIMIT = Math.sqrt(1*height*GRAVITY); // speed limit is dependent on height
-
 canvas.width = width;
 canvas.height = height;
+
+var ctx = canvas.getContext('2d');
 
 function mouseCoords(event) {
     var canvasBounds = canvas.getBoundingClientRect();
@@ -348,13 +354,9 @@ function collidesWithCeiling(ball) {
 // control panel
 
 function changeGravity() {
-    var gInput = document.getElementById('gravity-toggle');
-    gInput.value = GRAVITY*100;
-    gInput.onchange = function() {
-        GRAVITY = parseFloat(gInput.value)/100;
-        STIFFNESS = GRAVITY / FORCE;
-        SPEED_LIMIT = Math.sqrt(2*height*GRAVITY);
-    };
+    GRAVITY = parseFloat(gInput.value)/100;
+    STIFFNESS = GRAVITY / FORCE;
+    SPEED_LIMIT = Math.sqrt(1*height*GRAVITY);
 }
 
 var radioButtons = document.buttons.toggle;
